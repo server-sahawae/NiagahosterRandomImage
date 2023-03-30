@@ -20,7 +20,7 @@ module.exports = class Controller {
         attributes: ["file"],
         order: Sequelize.literal("rand()"),
       });
-      res.status(200).type("image/webp").send(file);
+      res.status(200).type("image/webp").send(Buffer.from(file));
     } catch (error) {
       next(error);
     }
