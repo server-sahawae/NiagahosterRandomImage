@@ -1,4 +1,5 @@
 const sharp = require("sharp");
+const { loggerError } = require("../helpers/loggerDebug");
 const { Image } = require("../models");
 
 module.exports = class Controller {
@@ -32,7 +33,6 @@ module.exports = class Controller {
         res.status(200).json(result.map((el) => el.name + " has been added"));
       }
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }
