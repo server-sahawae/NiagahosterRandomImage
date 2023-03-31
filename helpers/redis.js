@@ -1,15 +1,29 @@
+const { series } = require("async");
 const { APPLICATION_ID } = require("../constants/Ids");
+const redisFile = require("../config/redisFiles");
+const redisText = require("../config/redisText");
 
-const redisFileList = (CompanyId, UserId, fileType) => {
-  return `${APPLICATION_ID}:${UserId}:${fileType}`;
+const filterRedisKeys = async (filter) => {
+  console.log(filter);
+  let redisFileKeys = await redisFile.keys("*");
+  redisFileKeys = redisFileKeys.filter((key) => {
+    return key.toLowerCase().includes(filter.toLowerCase());
+  });
+  let redisTextKeys = await redisText.keys("*");
+  redisTextKeys = redisTextKeys.filter((key) => {
+    return key.toLowerCase().includes(filter.toLowerCase());
+  });
+  return [...new Set([...redisFileKeys, ...redisTextKeys])];
 };
 
-const redisDel = async (CompanyId, UserId, fileType) => {
+const deleteRedisKeys = async (keys) => {
   try {
-    await redis.del(`${APPLICATION_ID}:${CompanyId}:${UserId}:${fileType}`);
+    for (let i = 0; i < keys.length; i++) {
+      await redisFile.del(keys[i]);
+      await redisText.del(keys[i]);
+    }
   } catch (error) {
-    return error;
+    throw error;
   }
 };
-
-module.exports = { redisFileList, redisDel };
+module.exports = { filterRedisKeys, deleteRedisKeys };
